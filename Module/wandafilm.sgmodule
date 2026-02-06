@@ -1,0 +1,37 @@
+#!name=万达电影去广告
+#!desc=全面净化
+#!category=AdBlock
+#!system=ios
+#!arguments=积分到期提醒:false
+#!arguments-desc=- true: 我的页显示“积分即将过期”提醒\n- false: 我的页不显示“积分即将过期”提醒\n
+
+[Map Local]
+# 搜索栏填充词
+^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_banner_batch\.api\?bannerInfos=.*?areaSymbol%22%3A%22Search data-type=file data="https://raw.githubusercontent.com/Nathalie-Annis/Surge/refs/heads/main/Mock/wandafilm/Search" header="Content-Type: text/plain" status-code=200
+# 搜索栏热搜|首页推荐资讯
+^https:\/\/front-gateway-c\.wandafilm\.com\/content\/(search_input_integrate|index_content_list)\.api\? data-type=text data="{}" header="Content-Type: application/json" status-code=200
+# 首页商品推荐
+^https:\/\/card-api-prd-mx\.wandafilm\.com\/card\/cinema_cards\.api\? data-type=text data="{}" header="Content-Type: text/plain" status-code=200
+# 吃喝玩乐banner&弹窗
+^https:\/\/front-gateway-c\.wandafilm\.com\/recommend\/recommend_list\.api\? data-type=text data="{}" header="Content-Type: application/json" status-code=200
+# 影片详情页banner|影片/影城tab banner|电影票页banner
+^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_banner_batch\.api\?bannerInfos=.*?areaSymbol%22%3A%22(Film_tag_ad|Movies_banner|TicketOrderList_Banner) data-type=text data="{}" header="Content-Type: text/plain" status-code=200
+# 订单详情banner
+^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_banner\.api\?.*?pageSymbol=OrderDetail_Ticket data-type=text data="{}" header="Content-Type: text/plain" status-code=200
+
+[Body Rewrite]
+# 开屏广告&首页弹窗
+http-response-jq "^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_banner_batch\.api\?bannerInfos=.*?areaSymbol%22%3A%22FlashAD" 'del(.data.objects["OpenAPP-&-FlashAD","InTheaters-&-BoxAD"])'
+# 首页banner&影片特惠提示
+http-response-jq "^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_banner_batch\.api\?bannerInfos=.*?areaSymbol%22%3A%22Home_Banner" 'del(.data.objects["NewHome-&-Home_Banner","NewHome-&-HBTips"])'
+# 首页tab栏
+http-response-jq ^https:\/\/front-gateway-c\.wandafilm\.com\/misc\/acm\/tab\/list\.api\? '.data |= map(select(.tabName == "推荐"))'
+# Rtime会员页精简
+http-response-jq "^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_banner_batch_v2\.api\?bannerInfos=.*?pageSymbol%22%3A%22StarMember" '.data.objects |= with_entries(select(.key == "StarMember-&-PorcelainArea"))'
+# W+会员页精简
+http-response-jq "^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_banner_batch_v2\.api\?bannerInfos=.*?pageSymbol%22%3A%22MemberClub" 'del(.data.objects["MemberClub-&-Renewal_ad","MemberClub-&-2024_Privilege_Banner"])'
+# 我的页精简
+http-response-jq ^https:\/\/user-api-prd-mx\.wandafilm\.com\/user\/user_points_level_coupon_card_info\.api\? '.data.ticketBubble |= if test("^待评价[0-9]+部$") then "" else . end | if {{{积分到期提醒}}} then . else .data.expiredPointsRemindContent = "" end'
+
+[MITM]
+hostname = %APPEND% misc-api-prd-mx.wandafilm.com, front-gateway-c.wandafilm.com, user-api-prd-mx.wandafilm.com, card-api-prd-mx.wandafilm.com
