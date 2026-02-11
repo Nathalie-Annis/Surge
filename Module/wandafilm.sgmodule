@@ -22,12 +22,16 @@
 ^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_banner\.api\?.*?pageSymbol=OrderDetail_Ticket data-type=text data="{}" header="Content-Type: text/plain" status-code=200
 # 我的页底部banner
 ^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_banner\.api\?areaSymbol=MyTab_NAD data-type=text data="{}" header="Content-Type: text/plain" status-code=200
+# 首页影片想看有礼提示
+^http:\/\/wdimg\.mtime\.com\/prd\/mock\/tiny\.gif data-type=tiny-gif data="" status-code=200
 
 [Body Rewrite]
 # 开屏广告&首页弹窗
 http-response-jq "^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_banner_batch\.api\?bannerInfos=.*?areaSymbol%22%3A%22FlashAD" 'del(.data.objects["OpenAPP-&-FlashAD","InTheaters-&-BoxAD"])'
 # 首页banner&影片特惠提示
 http-response-jq "^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_banner_batch\.api\?bannerInfos=.*?areaSymbol%22%3A%22Home_Banner" 'del(.data.objects["NewHome-&-Home_Banner","NewHome-&-HBTips"])'
+# 首页影片想看有礼提示
+http-response-jq ^https:\/\/front-gateway-c\.wandafilm\.com\/member_mission\/mission\/listXkylMission\.api\? '.data.missionList[].listPageImgUrl = "http://wdimg.mtime.com/prd/mock/tiny.gif"'
 # 首页tab栏
 http-response-jq ^https:\/\/front-gateway-c\.wandafilm\.com\/misc\/acm\/tab\/list\.api\? '.data |= map(select(.tabName == "推荐"))'
 # Rtime会员页精简
