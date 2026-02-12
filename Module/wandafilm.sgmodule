@@ -28,8 +28,8 @@
 [Body Rewrite]
 # 开屏广告&首页弹窗
 http-response-jq "^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_banner_batch\.api\?bannerInfos=.*?areaSymbol%22%3A%22FlashAD" 'del(.data.objects["OpenAPP-&-FlashAD","InTheaters-&-BoxAD"])'
-# 首页banner&影片特惠提示
-http-response-jq "^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_banner_batch\.api\?bannerInfos=.*?areaSymbol%22%3A%22Home_Banner" 'del(.data.objects["NewHome-&-Home_Banner","NewHome-&-HBTips"])'
+# 首页banner&影片特惠提示&观影活动广告
+http-response-jq "^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_banner_batch\.api\?bannerInfos=.*?areaSymbol%22%3A%22Home_Banner" 'del(.data.objects["NewHome-&-Home_Banner","NewHome-&-HBTips","NewHome-&-FilmAD"])'
 # 首页影片想看有礼提示
 http-response-jq ^https:\/\/front-gateway-c\.wandafilm\.com\/member_mission\/mission\/listXkylMission\.api\? '.data.missionList[].listPageImgUrl = "http://wdimg.mtime.com/prd/mock/tiny.gif"'
 # 首页tab栏
