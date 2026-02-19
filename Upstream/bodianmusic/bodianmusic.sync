@@ -1,0 +1,26 @@
+Upstream:
+https://kelvinlab.wuyra.com/Module/BodianMusic.sgmodule
+https://raw.githubusercontent.com/WeiGiegie/666/main/bdyy.js
+
+[Body Rewrite]
+Add:
+# 我的页/会员页伪装
+http-response-jq ^https:\/\/bd-api\.kuwo\.cn\/api\/ucenter\/users\/(pub|login) '.data.payInfo += {"isSignedBoolean":true,"isCtVipBoolean":true,"ctExpireDate":4082937240000,"isVip":1,"signedCount":999,"isVipBoolean":true,"isBigVipBoolean":true,"bigExpireDate":4082937240000,"vipType":1,"payExpireDate":4082937240000,"actExpireDate":4082937240000,"isActVipBoolean":true,"isPayVipBoolean":true,"payVipType":1,"isSigned":1,"expireDate":4082937240000,"lastOrderPrice":0,"lastOrderSigned":0,"redFlower":999} | .data.userInfo += {"isVip":1,"vipType":1,"payVipType":1,"authType":1,"headOuterImg":"https://bodiancdn.kuwo.cn/file/e8d17fe6ebff7bb5d99f03cd710335a3.gif"}'
+# 搜索框精简
+http-response-jq ^https:\/\/bd-api\.kuwo\.cn\/api\/search\/topic\/word\/list\? '.data |= (with_entries(select(.key | IN("hotWord","kingKong"))) | .hotWord[]?.icon = "")'
+
+Replace:
+# 精简主页 1-轮播图 2-波波排行榜 3-偶遇心动歌曲 4-个性化歌单 5-宝藏歌曲库 6-波点实验室 8-广告 9-音乐日历 10-心动收藏相似推荐
+http-response-jq ^https:\/\/bd-api\.kuwo\.cn\/api\/service\/home\/index '.data.moduleList |= (if type=="array" then map(select(.type | IN(1,6,8) | not)) else . end)'
+# 移除侧边栏沉浸电台banner
+# http-response-jq ^https:\/\/bd-api\.kuwo\.cn\/api\/voice\/room\/v2\/sidebar '.data = {}'
+
+[Map Local]
+Delete:
+# 移除搜索框热词
+^https:\/\/bd-api\.kuwo\.cn\/api\/search\/topic\/word data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+[Script]
+Delete regex:
+ucenter\/users\/(?:pub|login)|
+search\/topic\/word\/list|
