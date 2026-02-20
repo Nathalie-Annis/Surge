@@ -2,8 +2,8 @@
 #!desc=全面净化
 #!category=AdBlock
 #!system=ios
-#!arguments=底栏我的红点:false,积分到期提醒:false
-#!arguments-desc=底栏我的红点\n- true:  底栏-我的 显示优惠券下发等原因出现的红点\n- false: 底栏-我的 隐藏红点\n\n积分到期提醒\n- true:  我的页显示“积分即将过期”提醒\n- false: 我的页不显示“积分即将过期”提醒\n
+#!arguments=底栏我的红点:false,底栏优惠券到期提醒:false,积分到期提醒:false
+#!arguments-desc=底栏我的红点\n- true:  底栏-我的 显示优惠券下发等原因出现的红点\n- false: 底栏-我的 隐藏红点\n\n底栏优惠券到期提醒\n- true:  底栏-我的 弹出“优惠券即将过期”提醒\n- false: 底栏-我的 不弹出“优惠券即将过期”提醒\n\n积分到期提醒\n- true:  我的页显示“积分即将过期”提醒\n- false: 我的页不显示“积分即将过期”提醒\n
 
 [Map Local]
 # 搜索栏填充词
@@ -42,6 +42,8 @@ http-response-jq "^https:\/\/misc-api-prd-mx\.wandafilm\.com\/commend\/common_ba
 http-response-jq ^https:\/\/user-api-prd-mx\.wandafilm\.com\/user\/user_points_level_coupon_card_info\.api\? '.data.ticketBubble |= if test("^待评价[0-9]+部$") then "" else . end | if {{{积分到期提醒}}} then . else .data.expiredPointsRemindContent = "" end'
 # 底栏我的红点
 http-response-jq ^https:\/\/misc-api-prd-mx\.wandafilm\.com\/hotnote\/info\.api\? ".data.myHotNote = {{{底栏我的红点}}}"
+# 底栏我的优惠券过期提醒
+http-response-jq ^https:\/\/coupon-api-prd-mx\.wandafilm\.com\/coupon\/expiresoon\.api\? "if {{{底栏优惠券到期提醒}}} then . else .data.count = 0 end"
 
 [MITM]
 hostname = %APPEND% misc-api-prd-mx.wandafilm.com, front-gateway-c.wandafilm.com, user-api-prd-mx.wandafilm.com, card-api-prd-mx.wandafilm.com
